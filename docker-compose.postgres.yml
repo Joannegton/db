@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres-central
+
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: ${DB_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${DB_POSTGRES_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+      TZ: America/Sao_Paulo
+
+    ports:
+      - "127.0.0.1:${DB_PORT:-5432}:5432"  # Só localhost - banco invisível para internet
+
+    volumes:
+      # Persistência de dados
+      - postgres_data:/var/lib/postgresql/data
+
+      # WAL Archive (útil para backups PITR no futuro)
+      - postgres_wal:/var/lib/postgresql/wal_archive
+
+      # Configurações customizadas (melhor caminho)
+      - ./postgres.conf:/etc/postgresql/postgresql.conf:ro
+      - ./pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+
+      # Script de inicialização (roda só na primeira vez)
+      - ./postgres-setup.sql:/docker-entrypoint-initdb.d/01-setup.sql:ro
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Limites de recursos
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '2'
+    #       memory: 2G
+    #     reservations:
+    #       cpus: '1'
+    #       memory: 1G
+
+volumes:
+  postgres_data:
+    driver: local
+  postgres_wal:
+    driver: local
+
+networks:
+  default:
+    name: backend
+    driver: bridge
