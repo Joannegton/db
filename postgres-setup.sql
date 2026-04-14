@@ -25,10 +25,6 @@ ALTER ROLE bot_financas_app SET statement_timeout = '30s';
 -- 2. CRIAR BANCOS DE DADOS
 -- ===========================================
 
--- Deletar bancos se existirem (para reset)
-DROP DATABASE IF EXISTS auth;
-DROP DATABASE IF EXISTS bot_financas;
-
 -- Criar bancos
 CREATE DATABASE auth WITH OWNER auth_app ENCODING 'UTF8';
 CREATE DATABASE bot_financas WITH OWNER bot_financas_app ENCODING 'UTF8';
