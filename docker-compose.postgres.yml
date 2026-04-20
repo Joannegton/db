@@ -15,12 +15,22 @@ services:
     ports:
       - "127.0.0.1:${DB_PORT:-5432}:5432"  # Só localhost - banco invisível para internet
 
+    # IMPORTANTE: Carrega o arquivo postgres.conf customizado na inicialização
+    # Sem isso, todas as configurações em postgres.conf são ignoradas
+    command:
+      - postgres
+      - -c
+      - config_file=/etc/postgresql/postgresql.conf
+
     volumes:
       # Persistência de dados
       - postgres_data:/var/lib/postgresql/data
 
       # WAL Archive (útil para backups PITR no futuro)
       - postgres_wal:/var/lib/postgresql/wal_archive
+
+      # Logs 
+      - ./logs:/var/lib/postgresql/data/log
 
       # Configurações customizadas
       - ./postgres.conf:/etc/postgresql/postgresql.conf:ro
