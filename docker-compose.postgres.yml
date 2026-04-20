@@ -29,8 +29,8 @@ services:
       # WAL Archive (útil para backups PITR no futuro)
       - postgres_wal:/var/lib/postgresql/wal_archive
 
-      # Logs 
-      - ./logs:/var/lib/postgresql/data/log
+      # Logs
+      - ./logs:/var/lib/postgresql/data/pgdata/log
 
       # Configurações customizadas
       - ./postgres.conf:/etc/postgresql/postgresql.conf:ro
