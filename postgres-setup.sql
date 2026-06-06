@@ -12,14 +12,17 @@
 -- Deletar usuários se existirem (para reset)
 DROP ROLE IF EXISTS auth_app;
 DROP ROLE IF EXISTS bot_financas_app;
+DROP ROLE IF EXISTS beleze_app;
 
 -- Criar usuários com segurança
 CREATE ROLE auth_app WITH LOGIN PASSWORD 'aB7kQxM9wL2pRsT4vU5zY8nJ3cD6eF1hG';
 CREATE ROLE bot_financas_app WITH LOGIN PASSWORD 'mN4oP7qR8sT9uV2wX3yZ5aB6cD9eF1gH';
+CREATE ROLE beleze_app WITH LOGIN PASSWORD 'Kp9sV3xQ7mW2rT5yB8nJ4cL6dF1hG0zA';
 
 -- Configurar parâmetros padrão para os usuários
 ALTER ROLE auth_app SET statement_timeout = '30s';
 ALTER ROLE bot_financas_app SET statement_timeout = '30s';
+ALTER ROLE beleze_app SET statement_timeout = '30s';
 
 -- ===========================================
 -- 2. CRIAR BANCOS DE DADOS
@@ -28,6 +31,7 @@ ALTER ROLE bot_financas_app SET statement_timeout = '30s';
 -- Criar bancos
 CREATE DATABASE auth WITH OWNER auth_app ENCODING 'UTF8';
 CREATE DATABASE bot_financas WITH OWNER bot_financas_app ENCODING 'UTF8';
+CREATE DATABASE beleze WITH OWNER beleze_app ENCODING 'UTF8';
 
 -- ===========================================
 -- 3. PERMISSÕES NO BANCO auth
@@ -58,6 +62,21 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 GRANT ALL PRIVILEGES ON DATABASE bot_financas TO bot_financas_app;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO bot_financas_app;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO bot_financas_app;
+
+
+-- ===========================================
+-- 4b. PERMISSÕES NO BANCO beleze
+-- ===========================================
+
+\c beleze
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- beleze_app: OWNER do banco, acesso total
+GRANT ALL PRIVILEGES ON DATABASE beleze TO beleze_app;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO beleze_app;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO beleze_app;
 
 
 -- ===========================================
